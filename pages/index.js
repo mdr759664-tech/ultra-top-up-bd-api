@@ -1,4 +1,6 @@
+import Head from 'next/head';
 import { useState } from 'react';
+
 export default function Home(){
 const [menu,setMenu]=useState(false);
 const [show,setShow]=useState(null);
@@ -28,6 +30,16 @@ const handleLogin=()=>{
 
 return(
 <>
+<Head>
+  <title>Ultra Top Up BD API - Free Fire Diamond Top Up API Bangladesh</title>
+  <meta name="description" content="Ultra Top Up BD API - Bangladesh No 1 Free Fire Diamond Top Up API. Brazil Robot System, Owner 50% Reseller 30% Commission." />
+  <meta name="keywords" content="free fire top up api, ff diamond api bd, free fire api bangladesh, ultra top up bd" />
+  <meta name="robots" content="index, follow" />
+  <meta name="google-site-verification" content="toIDvIiHnfJHkhbznHAPLBK3No0vzck-ADveEeF_zZA" />
+  <meta property="og:title" content="Ultra Top Up BD API - FF Diamond API" />
+  <meta property="og:url" content="https://ultra-top-up-bd-api.vercel.app" />
+</Head>
+
 <style>{`
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
 .nav{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:#070d1a;border-bottom:1px solid #132040}
