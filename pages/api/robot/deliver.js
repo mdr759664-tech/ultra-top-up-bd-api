@@ -1,40 +1,46 @@
-// ULTRA TOP UP BD - GARENA ROBOT SYSTEM V2
+// ULTRA TOP UP BD - BRAZIL ROBOT SYSTEM
+let orders = []; // Memory te order save hobe
+
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'POST only' });
-  }
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { uid, diamond, order_id } = req.body || {};
-
-  if (!uid || !diamond) {
-    return res.status(400).json({ 
-      error: 'uid and diamond required',
-      example: { uid: "1234567890", diamond: 115 }
+  if (req.method === 'GET') {
+    return res.json({ 
+      robot: "Brazil Robot Live",
+      total_orders: orders.length,
+      orders: orders.slice(-20).reverse()
     });
   }
 
-  const txnId = `GARENA-${Date.now()}`;
-  const garenaShopId = `SHOP-${Math.random().toString(36).substr(2,9).toUpperCase()}`;
+  if (req.method === 'POST') {
+    const { uid, diamond, server, cost } = req.body;
+    
+    const order = {
+      id: "BR-" + Date.now(),
+      uid,
+      diamond,
+      server: server || "BRAZIL",
+      cost: cost || 16,
+      status: "processing",
+      brazil_status: "sending to Garena BR Shop",
+      created: new Date().toISOString(),
+      delivery_time: "30s - 2min"
+    };
 
-  console.log(`🤖 ULTRA ROBOT: ${diamond} Diamond -> ${uid} | Order: ${order_id}`);
+    orders.push(order);
 
-  // Robot Delivery Response
-  return res.status(200).json({
-    robot: 'ULTRA ROBOT V2 - ACTIVE',
-    status: 'delivered',
-    order_id: order_id || `UTB-${Date.now()}`,
-    uid: uid,
-    diamond_delivered: diamond,
-    transaction_id: txnId,
-    garena_txn: garenaShopId,
-    delivered_in: `${Math.floor(Math.random()*20+30)}s`,
-    method: 'Garena Official Store',
-    universal: true,
-    garena_official: true,
-    automation: 'puppeteer-ready',
-    message: `✅ ${diamond} Diamond Delivered to ${uid} via Garena Official`,
-    note: 'Any diamond list works - 25,50,115,116,150,310,610,Weekly,Monthly,Evo - All Supported',
-    bKash: '01837450067 - ULTRA TOP UP BD',
-    timestamp: new Date().toISOString()
-  });
+    // Simulate Brazil delivery
+    setTimeout(() => {
+      order.status = "delivered";
+      order.brazil_status = "delivered from Brazil Garena";
+    }, 5000);
+
+    return res.json({
+      success: true,
+      robot: "Brazil Robot Dispatched",
+      order_id: order.id,
+      message: `Robot sending ${diamond} to ${uid} via Brazil Server`
+    });
+  }
 }
