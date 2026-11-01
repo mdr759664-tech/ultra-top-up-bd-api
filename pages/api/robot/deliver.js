@@ -1,22 +1,46 @@
-// ULTRA TOP UP BD - DYNAMIC ROBOT - ANY DIAMOND AMOUNT + BKASH WALLET
+// ULTRA TOP UP BD - SECURE DYNAMIC ROBOT - ONLY FOR free-fire-bd-topup-s95l.vercel.app
 let orders = [];
 let users = {};
-let wallets = {}; // RESELLER WALLETS
-let ownerWallet = { balance: 0, total_earned: 0, bKash: '01837450067' }; // OWNER WALLET
+let wallets = {};
+let ownerWallet = { balance: 0, total_earned: 0, bKash: '01837450067' };
 
-// Per Diamond Rate
 const PER_DIAMOND_COST = 1.45;
 const PROFIT_PERCENT = 20;
 const OWNER_BKASH = '01837450067';
 
+// 🔒 SECURE CONFIG - Vercel Env থেকে নিবে
+const OWNER_API_KEY = process.env.OWNER_API_KEY || 'ULTRA_Z6KL81JMXG_654270';
+const ALLOWED_DOMAIN = 'free-fire-bd-topup-s95l.vercel.app';
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // 🔒 CORS - শুধু তোর Website Allow
+  const origin = req.headers.origin || req.headers.referer || '';
+  const isAllowedOrigin = origin.includes(ALLOWED_DOMAIN) || origin.includes('ultra-top-up-bd-api.vercel.app') || origin.includes('localhost') || !origin;
+  
+  if (isAllowedOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', `https://${ALLOWED_DOMAIN}`);
+  }
+  
   res.setHeader('Access-Control-Allow-Headers', 'x-api-key, Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  // 🔒 DOMAIN BLOCK - অন্য Website থেকে Block
+  if (origin && !isAllowedOrigin && req.method === 'POST') {
+    return res.status(403).json({ 
+      success: false, 
+      error: `❌ Domain Blocked! Only ${ALLOWED_DOMAIN} Allowed! Contact ${OWNER_BKASH}`,
+      your_domain: origin,
+      allowed: ALLOWED_DOMAIN
+    });
+  }
 
   if (req.method === 'GET') {
     return res.json({
-      robot: "DYNAMIC BRAZIL ROBOT Live 🇧🇷 - Any Diamond Amount!",
+      robot: "DYNAMIC BRAZIL ROBOT Live 🇧🇷 - SECURE!",
+      secure_for: ALLOWED_DOMAIN,
       per_diamond_cost: `${PER_DIAMOND_COST} TK`,
       profit: `${PROFIT_PERCENT}%`,
       split: "Owner 50% | Reseller 30% | Server 20%",
@@ -30,18 +54,36 @@ export default async function handler(req, res) {
         "9999 Diamond": "যেকোনো Amount চলবে!"
       },
       total_orders: orders.length,
-      orders: orders.slice(-20).reverse()
+      orders: orders.slice(-20).reverse(),
+      security: `🔒 Locked for ${ALLOWED_DOMAIN} Only`
     });
   }
 
   if (req.method === 'POST') {
     let { uid, diamond, pack, server, region, reseller_email } = req.body;
-    const apiKey = req.headers['x-api-key'] || req.body.api_key || reseller_email || 'OWNER';
+    const apiKey = req.headers['x-api-key'] || req.body.api_key || reseller_email || '';
+
+    // 🔒 1. API KEY CHECK - তুই ছাড়া কেউ Use করতে পারবে না
+    if (!apiKey) {
+      return res.status(401).json({ success: false, error: '❌ API Key Missing! Owner: ' + OWNER_BKASH });
+    }
+
+    // Owner Key অথবা ULTRA_RES_ দিয়ে শুরু হওয়া Key Allow
+    const isOwner = apiKey === OWNER_API_KEY;
+    const isReseller = apiKey.startsWith('ULTRA_RES_');
+    
+    if (!isOwner && !isReseller) {
+      return res.status(401).json({ 
+        success: false, 
+        error: `❌ Invalid API Key! Only Owner & Reseller Allowed! Contact ${OWNER_BKASH}`,
+        hint: 'Get Reseller Key from Owner'
+      });
+    }
 
     let amount = parseInt(String(diamond || pack || "0").replace(/\D/g, ''));
     
     if (!uid) return res.status(400).json({ success: false, error: 'UID দাও বস!' });
-    if (!amount || amount <= 0) return res.status(400).json({ success: false, error: 'Diamond amount দাও! Ex: 100, 115, 520 যেকোনো!' });
+    if (!amount || amount <= 0) return res.status(400).json({ success: false, error: 'Diamond amount দাও!' });
 
     const cost = Math.round(amount * PER_DIAMOND_COST);
     const profit = Math.round(cost * (PROFIT_PERCENT / 100));
@@ -58,18 +100,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ 
         success: false, 
         error: `Balance কম! লাগবে ${cost} TK, আছে ${users[apiKey].balance} TK`,
-        need_amount: amount,
         recharge: OWNER_BKASH
       });
     }
 
     users[apiKey].balance -= cost;
     users[apiKey].earned += resellerProfit;
-
-    // 🔥 AUTO WALLET ADD - BKASH SYSTEM
     wallets[apiKey].balance += resellerProfit;
     wallets[apiKey].total_earned += resellerProfit;
-    
     ownerWallet.balance += ownerProfit;
     ownerWallet.total_earned += ownerProfit;
 
@@ -83,27 +121,22 @@ export default async function handler(req, res) {
       sell_price: sell,
       total_profit: profit,
       split: {
-        owner_50: `${ownerProfit} TK -> Added to ${OWNER_BKASH} Wallet`,
-        reseller_30: `${resellerProfit} TK -> Added to ${apiKey} Wallet`,
+        owner_50: `${ownerProfit} TK -> ${OWNER_BKASH} Wallet ✅`,
+        reseller_30: `${resellerProfit} TK -> ${apiKey} Wallet ✅`,
         server_20: `${serverCost} TK`
       },
       reseller_wallet: {
         email: apiKey,
         current_balance: wallets[apiKey].balance,
         total_earned: wallets[apiKey].total_earned,
-        withdraw_status: `Withdraw করতে পারবে - ${OWNER_BKASH} থেকে bKash যাবে`
       },
       owner_wallet: {
         bKash: OWNER_BKASH,
         current_balance: ownerWallet.balance,
-        total_earned: ownerWallet.total_earned
       },
       balance_left: users[apiKey].balance,
-      status: "delivered - Dynamic Robot",
-      bKash_payout_info: {
-        reseller_will_get: `${resellerProfit} TK in wallet - Withdraw করলে ${OWNER_BKASH} থেকে যাবে`,
-        owner_got: `${ownerProfit} TK added to owner wallet`
-      },
+      status: "delivered - Secure Robot 🔒",
+      secure_for: ALLOWED_DOMAIN,
       created: new Date().toISOString()
     };
 
@@ -111,22 +144,19 @@ export default async function handler(req, res) {
 
     return res.json({
       success: true,
-      robot: "🤖 Dynamic Robot Dispatched!",
+      robot: "🤖 Secure Robot Dispatched!",
       message: `Robot sending ${amount} Diamond to ${uid}`,
       order_id: order.id,
+      secure: `🔒 Locked for ${ALLOWED_DOMAIN}`,
       dynamic_calc: {
         you_ordered: `${amount} Diamond`,
         cost: `${cost} TK`,
-        sell: `${sell} TK`,
-        profit: `${profit} TK`,
-        owner_get: `${ownerProfit} TK -> ${OWNER_BKASH} Wallet Auto Added ✅`,
-        reseller_get: `${resellerProfit} TK -> Wallet Auto Added ✅`,
-        bKash_system: `Reseller Wallet: ${wallets[apiKey].balance} TK - Withdraw দিলে ${OWNER_BKASH} থেকে bKash যাবে!`
+        owner_get: `${ownerProfit} TK -> ${OWNER_BKASH} ✅`,
+        reseller_get: `${resellerProfit} TK -> Wallet ✅`,
       },
       wallet_update: {
         reseller_wallet_balance: wallets[apiKey].balance,
         owner_wallet_balance: ownerWallet.balance,
-        bKash_number: OWNER_BKASH
       },
       order: order
     });
