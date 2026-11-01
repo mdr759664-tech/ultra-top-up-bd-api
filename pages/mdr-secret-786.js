@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Admin(){
 const [apiKey] = useState('ULTRA_'+Math.random().toString(36).toUpperCase().slice(2,12)+'_'+Date.now().toString().slice(-6));
@@ -8,10 +8,32 @@ const [orders] = useState([
  {id:'92345128', pack:'310 Diamond', status:'Success'},
  {id:'10293847', pack:'520 Diamond', status:'Pending'},
 ]);
+const [checked,setChecked]=useState(false);
+
+useEffect(()=>{
+ // 🔒 ADMIN GUARD - Public ঢুকতে পারবে না!
+ if(typeof window !== 'undefined'){
+   if(localStorage.getItem('isAdmin')!=='true'){
+     alert('⛔ Unauthorized! Admin Only!');
+     window.location.href='/';
+     return;
+   }
+   setChecked(true);
+ }
+},[]);
 
 const copy=()=>{
  navigator.clipboard.writeText(apiKey);
  alert('API Key Copied! ✅');
+}
+
+const handleLogout=()=>{
+ localStorage.removeItem('isAdmin');
+ window.location.href='/';
+}
+
+if(!checked){
+ return <div style={{minHeight:'100vh',background:'#070e1f',color:'white',display:'flex',alignItems:'center',justifyContent:'center'}}>Checking Admin...</div>
 }
 
 return(
@@ -39,13 +61,13 @@ body{background:#070e1f}
       <div className="logo"></div>
       <span style={{fontWeight:900,lineHeight:1.1,fontSize:'15px'}}>ULTRA TOP UP<br/>BD - ADMIN</span>
     </div>
-    <a href="/" style={{padding:'8px 14px',borderRadius:'10px',background:'#1e293b',color:'white',textDecoration:'none',fontSize:'13px',fontWeight:700}}>Logout</a>
+    <button onClick={handleLogout} style={{padding:'8px 14px',borderRadius:'10px',background:'#1e293b',color:'white',border:'none',fontSize:'13px',fontWeight:700,cursor:'pointer'}}>Logout</button>
   </div>
 
   <div style={{padding:'20px',maxWidth:'600px',margin:'0 auto'}}>
     
-    <h2 style={{fontSize:'22px',fontWeight:900}}>Dashboard</h2>
-    <p style={{fontSize:'13px',color:'#94a3b8',marginTop:'4px'}}>Welcome back, Admin</p>
+    <h2 style={{fontSize:'22px',fontWeight:900}}>Dashboard 🔒 Admin Only</h2>
+    <p style={{fontSize:'13px',color:'#94a3b8',marginTop:'4px'}}>Welcome back, Admin - Secured</p>
 
     <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginTop:'16px'}}>
       <div className="card"><div className="k">TOTAL BALANCE</div><div className="v">৳ {balance}</div><div style={{color:'#4ade80',fontSize:'12px',marginTop:'4px',fontWeight:700}}>+12% this week</div></div>
@@ -65,13 +87,13 @@ body{background:#070e1f}
       </div>
     </div>
 
-    <div className="card">
-      <h3 style={{fontSize:'16px',fontWeight:900}}>📚 How Customers Get API?</h3>
-      <div style={{marginTop:'12px',fontSize:'13px',lineHeight:'1.7',color:'#94a3b8'}}>
-        1. Customer Sign Up → Login → Gets API Key here<br/>
-        2. You Add Balance from this Panel<br/>
-        3. Customer Uses: <span style={{color:'white',fontFamily:'monospace',background:'#070d1a',padding:'2px 6px',borderRadius:'6px'}}>POST /api/topup</span> with x-api-key<br/>
-        4. Diamonds delivered in &lt;60s automatically
+    <div className="card" style={{background:'#0e2418',borderColor:'#14532d'}}>
+      <h3 style={{fontSize:'14px',fontWeight:900,color:'#4ade80'}}>✅ Security Active</h3>
+      <div style={{fontSize:'12px',color:'#86efac',marginTop:'8px',lineHeight:'1.6'}}>
+        • Public cannot access this page<br/>
+        • Only admin@ultra.com can see this<br/>
+        • Public redirected to Home<br/>
+        • Public Link: /dashboard (separate)
       </div>
     </div>
 
@@ -88,11 +110,11 @@ body{background:#070e1f}
     </div>
 
     <div style={{textAlign:'center',marginTop:'24px',padding:'20px'}}>
-      <p style={{fontSize:'12px',color:'#475569'}}>ULTRA TOP UP BD API • 256-bit Encrypted • 24/7 Support</p>
+      <p style={{fontSize:'12px',color:'#475569'}}>ULTRA TOP UP BD API • 256-bit Encrypted • 24/7 Support • Admin Secured 🔒</p>
     </div>
 
   </div>
 </div>
 </>
 )
-  }
+         }
