@@ -1,91 +1,75 @@
-import { useState } from 'react';
+export default function Home(){
+return(
+<>
+<style>{`
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
+body{background:#070e1f}
+.nav{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:#070d1a;border-bottom:1px solid #132040}
+.logo{width:32px;height:32px;background:linear-gradient(135deg,#60a5fa,#3b82f6);transform:rotate(45deg);border-radius:4px;box-shadow:0 0 15px #3b82f6}
+.hero{padding:40px 20px 30px;text-align:center;background:radial-gradient(ellipse at top,#12244a 0%,#0a1220 60%)}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;background:#152040;border:1px solid #1e3a5f;color:#93c5fd;font-size:13px;font-weight:600}
+.dot{width:8px;height:8px;background:#4ade80;border-radius:50%;box-shadow:0 0 8px #4ade80;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.h1{font-size:32px;font-weight:900;line-height:1.1;margin-top:20px;color:white}
+.blue{ background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.p{color:#94a3b8;font-size:15px;line-height:1.6;margin:16px auto 0;max-width:360px}
+.btns{display:flex;flex-direction:column;gap:12px;margin:28px auto 0;max-width:360px}
+.btn1{padding:16px;border-radius:16px;background:linear-gradient(90deg,#3b82f6,#6366f1);color:white;font-weight:800;text-align:center;text-decoration:none;box-shadow:0 8px 20px rgba(59,130,246,.4)}
+.btn2{padding:16px;border-radius:16px;background:#111d33;border:1px solid #1e293b;color:white;font-weight:700;text-align:center;text-decoration:none}
+.grid{grid-template-columns:1fr 1fr;display:grid;gap:12px;margin:30px auto 0;max-width:360px}
+.card{background:#111d33;border:1px solid #1e293b;border-radius:20px;padding:20px;text-align:center}
+.k{font-size:22px;font-weight:900;color:white}
+.v{font-size:10px;font-weight:800;color:#64748b;letter-spacing:.1em;margin-top:6px}
+.menuBtn{font-size:28px;background:none;border:none;color:white}
+.mobile{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;padding:16px;display:none}
+.mobile.open{display:block}
+.box{background:#0f1a2e;border:1px solid #1e293b;border-radius:20px;padding:24px;margin-top:60px}
+.mbtn{display:block;padding:14px;border-radius:12px;text-align:center;font-weight:700;text-decoration:none;margin-top:10px}
+.tele{position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:#229ED9;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:24px;text-decoration:none;box-shadow:0 4px 15px rgba(0,0,0,.3);z-index:50}
+`}</style>
 
-export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  return (
-    <div className="min-h-screen bg-[#080f1f] text-white">
-      {/* NAV */}
-      <nav className="flex justify-between items-center px-6 md:px-10 py-4 bg-[#070d1a] border-b border-[#132040] sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rotate-45 rounded-sm shadow-[0_0_15px_#3b82f6]"></div>
-          <span className="font-black text-[16px] leading-none">ULTRA TOP UP<br/>BD API</span>
-        </div>
-
-        {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center gap-5">
-          <a href="#features" className="text-[14px] text-gray-400 hover:text-white">Features</a>
-          <a href="#pricing" className="text-[14px] text-gray-400 hover:text-white">Pricing</a>
-          <a href="#docs" className="text-[14px] text-gray-400 hover:text-white">Docs</a>
-          <a href="#" className="text-[14px] text-gray-400">Status</a>
-          
-          <a href="/login" className="ml-4 px-5 py-2 rounded-lg border border-[#1e3a5f] bg-[#0f1c33] text-[13px] font-bold">Log In</a>
-          <a href="/signup" className="px-5 py-2 rounded-lg bg-white text-black text-[13px] font-bold">Sign Up</a>
-          <a href="/mdr-secret-786" className="px-5 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-[13px] font-bold shadow-[0_0_15px_rgba(59,130,246,0.5)]">API Access</a>
-          
-          <div className="ml-2 px-3 py-1 rounded-full border border-green-900 bg-[#0e2418] text-[10px] text-green-300 flex items-center gap-1.5"><span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>Live 24/7</div>
-        </div>
-
-        <button onClick={()=>setMenuOpen(!menuOpen)} className="md:hidden"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      </nav>
-
-      {/* HERO */}
-      <section className="px-6 md:px-20 py-12 md:py-20 bg-gradient-to-br from-[#0f2040] to-[#080f1f] text-center md:text-left">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#152040] border border-[#1e3a5f] text-[13px] text-blue-300 mb-6"><span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>Live & automated 24/7</div>
-        <h1 className="text-[32px] md:text-[52px] font-extrabold leading-[1.1]">Automated <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Free Fire Diamond</span><br/>Top-Up API for Resellers</h1>
-        <p className="text-[#94a3b8] mt-4 max-w-[600px] mx-auto md:mx-0">Plug into Topup Bot's API and deliver Free Fire diamond top-ups instantly — fully automated fulfillment, real-time webhooks, and a merchant dashboard.</p>
-        
-        <div className="flex flex-col md:flex-row gap-3 mt-8 max-w-[360px] md:max-w-none mx-auto md:mx-0">
-          <a href="/signup" className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 font-bold text-center">🚀 Sign Up Free →</a>
-          <a href="/login" className="px-8 py-4 rounded-xl bg-[#111d33] border border-gray-700 font-bold text-center">🔑 Log In</a>
-          <a href="#docs" className="px-8 py-4 rounded-xl bg-transparent border border-gray-700 font-bold text-center">📚 Read the Docs</a>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-10 max-w-[800px] mx-auto md:mx-0">
-          <div className="bg-[#111d33] border border-[#1e293b] rounded-2xl p-5 text-center"><div className="text-[24px] font-black">24/7</div><div className="text-[10px] text-gray-500 font-bold mt-1">AUTOMATED</div></div>
-          <div className="bg-[#111d33] border border-[#1e293b] rounded-2xl p-5 text-center"><div className="text-[24px] font-black">&lt;60s</div><div className="text-[10px] text-gray-500 font-bold mt-1">AVG DELIVERY</div></div>
-          <div className="bg-[#111d33] border border-[#1e293b] rounded-2xl p-5 text-center"><div className="text-[24px] font-black">100%</div><div className="text-[10px] text-gray-500 font-bold mt-1">WEBHOOK RETRIES</div></div>
-          <div className="bg-[#111d33] border border-[#1e293b] rounded-2xl p-5 text-center"><div className="text-[24px] font-black">256-bit</div><div className="text-[10px] text-gray-500 font-bold mt-1">ENCRYPTION</div></div>
-        </div>
-      </section>
-
-      {/* BUTTON SECTION EXTRA */}
-      <section id="pricing" className="px-6 md:px-20 py-10 bg-[#070d1a] border-y border-[#132040]">
-        <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-3">
-          <a href="/login" className="px-6 py-3 rounded-full bg-[#1e293b] border border-blue-800 text-[13px] font-bold">🔵 Log In</a>
-          <a href="/signup" className="px-6 py-3 rounded-full bg-blue-600 text-[13px] font-bold">📝 Sign Up</a>
-          <a href="/mdr-secret-786" className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-[13px] font-bold">⚡ API Access</a>
-          <a href="#docs" className="px-6 py-3 rounded-full bg-[#111d33] border border-gray-700 text-[13px] font-bold">API Docs</a>
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section id="features" className="px-6 md:px-20 py-14">
-        <h2 className="text-center text-[26px] font-extrabold">Everything you need to run a top-up business</h2>
-        <div className="grid md:grid-cols-3 gap-4 mt-10 max-w-6xl mx-auto">
-          {['Automated Diamond Delivery','Per-Merchant API Key & Wallet','Real-Time Webhooks','Voucher Auto-Restock','Merchant Dashboard','Telegram Alerts'].map(t=>(
-            <div key={t} className="bg-[#0f1c33] border border-[#1e293b] rounded-2xl p-6"><h3 className="font-bold">{t}</h3><p className="text-[13px] text-gray-400 mt-2">Topup Bot handles the automation, monitoring, and delivery for you.</p></div>
-          ))}
-        </div>
-      </section>
-
-      <footer className="py-8 text-center text-[11px] text-gray-600 border-t border-[#132040]">© 2026 ULTRA TOP UP BD API • Login • Signup • API Access • All Buttons Added</footer>
-
-      {/* MOBILE MENU */}
-      {menuOpen && (
-        <div className="fixed inset-0 bg-black/80 z-50 p-4 md:hidden">
-          <div className="bg-[#0f1a2e] border border-gray-800 rounded-2xl p-6">
-            <div className="flex justify-between mb-6"><h2 className="font-bold">Menu</h2><button onClick={()=>setMenuOpen(false)} className="w-8 h-8 bg-gray-800 rounded-full">✕</button></div>
-            <div className="flex flex-col gap-3">
-              <a href="/login" className="py-3.5 px-4 bg-[#1e3a5f] rounded-xl text-center font-bold">🔵 Log In</a>
-              <a href="/signup" className="py-3.5 px-4 bg-blue-600 rounded-xl text-center font-bold">📝 Sign Up</a>
-              <a href="/mdr-secret-786" className="py-3.5 px-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl text-center font-bold">⚡ API Access</a>
-              <a href="#features" className="py-3.5 px-4 bg-[#1a2744] rounded-xl text-center">Features</a>
-              <a href="#pricing" className="py-3.5 px-4 bg-[#1a2744] rounded-xl text-center">Pricing</a>
-              <a href="#docs" className="py-3.5 px-4 bg-[#1a2744] rounded-xl text-center">Docs</a>
-            </div>
-          </div>
-        </div>
-      )}
+<div>
+  <nav className="nav">
+    <div style={{display:'flex',alignItems:'center',gap:10}}>
+      <div className="logo"></div>
+      <span style={{fontWeight:900,lineHeight:1.1,color:'white'}}>ULTRA TOP UP<br/>BD API</span>
     </div>
-  )
-        }
+    <button onClick={()=>document.getElementById('m').classList.add('open')} className="menuBtn">☰</button>
+  </nav>
+
+  <div className="hero">
+    <div className="badge"><span className="dot"></span>Live & automated 24/7</div>
+    <h1 className="h1">Automated <span className="blue">Free Fire Diamond</span><br/>Top-Up API for Resellers</h1>
+    <p className="p">Plug into Topup Bot's API and deliver Free Fire diamond top-ups to your customers instantly — fully automated fulfillment, real-time webhooks, and a merchant dashboard to track every order.</p>
+    
+    <div className="btns">
+      <a href="/signup" className="btn1">Get API Access →</a>
+      <a href="/login" className="btn2">Read the Docs</a>
+    </div>
+
+    <div className="grid">
+      <div className="card"><div className="k">24/7</div><div className="v">AUTOMATED FULFILLMENT</div></div>
+      <div className="card"><div className="k">&lt;60s</div><div className="v">AVG. ORDER DELIVERY</div></div>
+      <div className="card"><div className="k">100%</div><div className="v">WEBHOOK DELIVERY<br/>RETRIES</div></div>
+      <div className="card"><div className="k">256-bit</div><div className="v">CREDENTIAL ENCRYPTION</div></div>
+    </div>
+  </div>
+
+  <a href="https://t.me/" className="tele">✈</a>
+
+  <div id="m" className="mobile" onClick={(e)=>{if(e.target.id==='m')e.currentTarget.classList.remove('open')}}>
+    <div className="box">
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px'}}>
+        <b style={{color:'white'}}>Menu</b>
+        <button onClick={()=>document.getElementById('m').classList.remove('open')} style={{width:'32px',height:'32px',borderRadius:'50%',background:'#1e293b',border:'none',color:'white'}}>✕</button>
+      </div>
+      <a href="/login" className="mbtn" style={{background:'#3b82f6',color:'white'}}>Log In</a>
+      <a href="/signup" className="mbtn" style={{background:'white',color:'black'}}>Sign Up</a>
+      <a href="/" className="mbtn" style={{background:'#1a2744',color:'white'}}>Home</a>
+      <a href="/login" className="mbtn" style={{background:'#1a2744',color:'white'}}>API Docs</a>
+    </div>
+  </div>
+</div>
+</>
+)
+  }
