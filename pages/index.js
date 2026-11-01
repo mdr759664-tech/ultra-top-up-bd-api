@@ -2,16 +2,27 @@ import { useState } from 'react';
 export default function Home(){
 const [menu,setMenu]=useState(false);
 const [show,setShow]=useState(null);
-const [email,setEmail]=useState('admin@ultra.com');
-const [pass,setPass]=useState('Mdr12345');
+const [email,setEmail]=useState('');
+const [pass,setPass]=useState('');
 const [msg,setMsg]=useState('');
 
 const handleLogin=()=>{
- if(email==='admin@ultra.com' && pass==='Mdr12345'){
-   setMsg('✅ Success! Going to Admin...');
+ // SECRET ADMIN CHECK - কেউ দেখবে না
+ if(email.toLowerCase()==='admin@ultra.com' && pass==='Mdr12345'){
+   localStorage.setItem('isAdmin','true');
+   setMsg('✅ Admin Success!');
    setTimeout(()=>{window.location.href='/mdr-secret-786'},800);
- } else {
-   setMsg('❌ Email: admin@ultra.com / Pass: Mdr12345');
+   return;
+ } 
+ // PUBLIC - যে কোনো Email/Pass দিয়ে Dashboard
+ if(email && pass.length>=4){
+   localStorage.setItem('user_email', email);
+   localStorage.removeItem('isAdmin');
+   setMsg('✅ Login Success!');
+   setTimeout(()=>{window.location.href='/dashboard'},800);
+ }
+ else {
+   setMsg('❌ Email আর Password (4 digit) দাও!');
  }
 }
 
@@ -76,10 +87,10 @@ return(
   <div className="loginBox" onClick={e=>e.stopPropagation()}>
    <div className="logo" style={{margin:'0 auto 12px'}}></div>
    <h2 style={{color:'white',fontWeight:900}}>{show==='login'?'Log In':'Sign Up'}</h2>
-   <input value={email} onChange={e=>setEmail(e.target.value)} className="input"/>
-   <input value={pass} onChange={e=>setPass(e.target.value)} className="input"/>
+   <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Your Email" className="input"/>
+   <input value={pass} onChange={e=>setPass(e.target.value)} placeholder="Password" type="password" className="input"/>
    {msg && <div style={{marginTop:'12px',padding:'10px',borderRadius:'10px',fontSize:'13px',background:msg.includes('✅')?'#0e2418':'#241010',color:msg.includes('✅')?'#4ade80':'#f87171'}}>{msg}</div>}
-   <button onClick={handleLogin} className="btn1" style={{width:'100%',marginTop:'16px'}}>Log In</button>
+   <button onClick={handleLogin} className="btn1" style={{width:'100%',marginTop:'16px'}}>{show==='login'?'Log In':'Create Account'}</button>
    <div style={{marginTop:'12px'}}><span onClick={()=>setShow(null)} style={{color:'#64748b',fontSize:'13px',cursor:'pointer'}}>← Close</span></div>
   </div>
  </div>
