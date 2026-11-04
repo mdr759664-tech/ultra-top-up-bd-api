@@ -1,12 +1,80 @@
 import { useState } from 'react';
+
 export default function BuyAPI(){
-  const [email,setEmail]=useState(''); const [trx,setTrx]=useState(''); const [status,setStatus]=useState(''); const [loading,setLoading]=useState(false);
-  const handleBuy=async()=>{
-    if(!email||!trx) return alert('Email+TrxID দাও!'); setLoading(true); setStatus('⏳ Checking 500 TK...');
-    try{
-      const r=await fetch('/api/buy-api',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,trxId:trx})});
-      const d=await r.json(); if(d.success) setStatus(`✅ Success!\n🔑 API Key: ${d.apiKey}\nHeader: x-api-key: ${d.apiKey}`); else setStatus(`❌ ${d.error}`);
-    }catch(e){setStatus('❌ Error');} setLoading(false);
+  const [email,setEmail]=useState('');
+  const [trx,setTrx]=useState('');
+  const [method,setMethod]=useState('bKash');
+  const [status,setStatus]=useState('');
+  const [loading,setLoading]=useState(false);
+
+  // এখানে তোমার নাম্বারগুলো বসাও
+  const numbers = {
+    bKash: 'YOUR_BKASH_NUMBER',
+    Nagad: 'YOUR_NAGAD_NUMBER',
+    Rocket: 'YOUR_ROCKET_NUMBER',
+    Upay: 'YOUR_UPAY_NUMBER'
   };
-  return(<div style={{background:'#000',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}}><div style={{background:'#111d33',padding:'30px',borderRadius:'20px',maxWidth:'400px',width:'100%'}}><h2 style={{color:'white',textAlign:'center'}}>🔑 Buy API - 500 TK</h2><p style={{color:'#fbbf24',textAlign:'center'}}>bKash: 01837450067</p><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" style={{width:'100%',padding:'14px',marginTop:'16px',borderRadius:'12px',background:'#070d1a',border:'1px solid #334155',color:'white'}}/><input value={trx} onChange={e=>setTrx(e.target.value)} placeholder="bKash TrxID" style={{width:'100%',padding:'14px',marginTop:'10px',borderRadius:'12px',background:'#070d1a',border:'1px solid #334155',color:'white'}}/><button onClick={handleBuy} disabled={loading} style={{width:'100%',marginTop:'16px',padding:'16px',borderRadius:'16px',background:'#3b82f6',color:'white',fontWeight:'800',border:'none'}}>{loading?'Checking...':'🚀 Get API Key'}</button>{status&&<p style={{color:'white',marginTop:'16px',background:'#070d1a',padding:'12px',borderRadius:'10px',whiteSpace:'pre-wrap'}}>{status}</p>}</div></div>);
+
+  const copyNumber = () => {
+    navigator.clipboard.writeText(numbers[method]);
+    alert(method + ' নাম্বার কপি হয়ে গেছে!');
+  };
+
+  const handleBuy = async () => {
+    if(!email || !trx) return alert('ইমেইল + TrxID দাও!');
+    // Admin হলে টাকা ছাড়াই
+    const isAdmin = email === 'admin@gmail.com';
+    setLoading(true);
+    setStatus('⏳ রোবট চেক করতেছে...');
+    try{
+      const r = await fetch('/api/buy-api',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({email, trxId: trx, method, isAdmin})
+      });
+      const d = await r.json();
+      if(d.success) setStatus(`✅ Success!\n🔑 API Key: ${d.apiKey}\nকপি করে রাখো!\nHeader: x-api-key: ${d.apiKey}`);
+      else setStatus(`❌ ${d.error}`);
+    }catch(e){ setStatus('❌ Error'); }
+    setLoading(false);
+  };
+
+  return(
+  <div style={{background:'#fff',minHeight:'100vh',padding:'0'}}>
+    <div style={{background:'#e91e63',padding:'15px',display:'flex',alignItems:'center',gap:'10px',color:'white',fontWeight:'800'}}>
+      <span>←</span><span>🔒 নিরাপদ পেমেন্ট - নিরা...</span>
+    </div>
+
+    <div style={{padding:'15px'}}>
+      <p style={{color:'#e91e63',fontWeight:'800',fontSize:'18px'}}>নিরাপদ পেমেন্ট</p>
+      <div style={{background:'#f1f5f9',padding:'14px',borderRadius:'12px',fontSize:'22px',fontWeight:'800'}}>৳ 500</div>
+
+      {/* পেমেন্ট বাটন */}
+      <div style={{display:'flex',gap:'8px',marginTop:'12px'}}>
+        {['bKash','Nagad','Rocket','Upay'].map(m=>(
+          <button key={m} onClick={()=>setMethod(m)} style={{flex:1,padding:'12px',borderRadius:'10px',border:'none',background:method===m?'#e91e63':'#e2e8f0',color:method===m?'white':'black',fontWeight:'800'}}>{m}</button>
+        ))}
+      </div>
+
+      <div style={{background:'#e91e63',padding:'20px',borderRadius:'15px',marginTop:'15px',color:'white'}}>
+        <h3 style={{textAlign:'center'}}>ট্রানজেকশন আইডি দিন</h3>
+        <input value={trx} onChange={e=>setTrx(e.target.value)} placeholder="ট্রানজেকশন আইডি দিন" style={{width:'100%',padding:'14px',borderRadius:'10px',border:'none',marginTop:'10px'}} />
+        <p style={{marginTop:'15px'}}>• *247# ডায়াল করে আপনার {method} অ্যাপ খুলুন</p>
+        <p>• Send Money -এ ক্লিক করুন</p>
+        <p>• এই নম্বরে টাকা পাঠান: <b>{numbers[method]}</b> <button onClick={copyNumber} style={{background:'#7c0a2d',color:'white',border:'none',padding:'6px 12px',borderRadius:'8px'}}>📋 কপি</button></p>
+        <p>• টাকার পরিমাণ: <b>500</b></p>
+        <p>• নিশ্চিত করে এখন আপনার {method} PIN লিখুন</p>
+        <p>• টাকা পাঠান এবং ট্রানজেকশন আইডি কপি করুন</p>
+        <p>• ট্রানজেকশন আইডি লিখে ভেরিফাই চাপুন</p>
+      </div>
+
+      <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="আপনার ইমেইল দিন" style={{width:'100%',padding:'14px',marginTop:'15px',borderRadius:'10px',border:'1px solid #cbd5e1'}} />
+
+      <button onClick={handleBuy} disabled={loading} style={{width:'100%',marginTop:'15px',padding:'16px',borderRadius:'12px',background:'#b91c1c',color:'white',fontWeight:'800',border:'none',fontSize:'18px'}}>
+        {loading?'চেক হচ্ছে...':'ভেরিফাই'}
+      </button>
+
+      {status && <p style={{marginTop:'15px',background:'#0f172a',color:'white',padding:'12px',borderRadius:'10px',whiteSpace:'pre-wrap'}}>{status}</p>}
+    </div>
+  </div>);
 }
