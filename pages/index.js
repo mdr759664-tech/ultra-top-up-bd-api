@@ -9,14 +9,17 @@ const [pass,setPass]=useState('');
 const [msg,setMsg]=useState('');
 
 const handleLogin=()=>{
- // SECRET ADMIN CHECK - কেউ দেখবে না
- if(email.toLowerCase()==='admin@ultra.com' && pass==='Mdr12345'){
+ // ADMIN CHECK - password ekhon code e nai, Vercel Env e thakbe
+ const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+ const ADMIN_PASS = process.env.NEXT_PUBLIC_ADMIN_PASS;
+
+ if(email.toLowerCase()===ADMIN_EMAIL && pass===ADMIN_PASS){
    localStorage.setItem('isAdmin','true');
    setMsg('✅ Admin Success!');
-   setTimeout(()=>{window.location.href='/mdr-secret-786'},800);
+   setTimeout(()=>{window.location.href='/admin'},800);
    return;
  } 
- // PUBLIC - যে কোনো Email/Pass দিয়ে Dashboard
+ // PUBLIC - je kono Email/Pass diye Dashboard
  if(email && pass.length>=4){
    localStorage.setItem('user_email', email);
    localStorage.removeItem('isAdmin');
@@ -24,7 +27,7 @@ const handleLogin=()=>{
    setTimeout(()=>{window.location.href='/dashboard'},800);
  }
  else {
-   setMsg('❌ Email আর Password (4 digit) দাও!');
+   setMsg('❌ Email ar Password (4 digit) dao!');
  }
 }
 
