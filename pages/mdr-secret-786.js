@@ -7,17 +7,16 @@ const [myCommission,setMyCommission]=useState(0);
 const [resellerCommission,setResellerCommission]=useState(0);
 const [brazilSent,setBrazilSent]=useState(0);
 
-// নতুন অর্ডারের জন্য
 const [uid,setUid]=useState('');
-const [serverId,setServerId]=useState('BD');
-const [pack,setPack]=useState('100 Diamond');
-const [price,setPrice]=useState(100);
+const [serverId,setServerId]=useState('ALL');
+const [pack,setPack]=useState('');
+const [price,setPrice]=useState('');
 const [lastSplit,setLastSplit]=useState(null);
 
 const [orders,setOrders] = useState([
- {id:'83456291', pack:'100 Diamond', status:'Success', uid:'123456', price:100},
- {id:'92345128', pack:'310 Diamond', status:'Success', uid:'789012', price:300},
- {id:'10293847', pack:'520 Diamond', status:'Pending', uid:'345678', price:500},
+ {id:'83456291', pack:'100 Diamond', status:'Success', uid:'123456', price:100, country:'ALL'},
+ {id:'92345128', pack:'310 Diamond', status:'Success', uid:'789012', price:300, country:'ALL'},
+ {id:'10293847', pack:'520 Diamond', status:'Pending', uid:'345678', price:500, country:'ALL'},
 ]);
 const [checked,setChecked]=useState(false);
 
@@ -42,14 +41,23 @@ const handleLogout=()=>{
  window.location.href='/';
 }
 
-// ★★★ মেইন রোবট - এখানেই টাকা ভাগ হয় ★★★
+// ★★★ মেইন রোবট - 60% তুমি, 20% TopUp, 20% Brazil - ALL সার্ভার, সব দেশ Brazil এ যাবে ★★★
 const handleNewOrder = async () => {
   if(!uid) return alert('কাস্টমারের UID দাও!');
+  if(!pack) return alert('প্যাকেজের নাম দাও! যেকোনো প্যাকেজ চলবে');
+  if(!price) return alert('দাম দাও! Top Up ওয়েবসাইটে যে দাম আছে ওইটা দাও');
   const total = Number(price);
-  // তোমার হিসাব: 30% TopUp, 60% তুমি, 10% Brazil
-  const toReseller = Math.round(total * 0.30);
+
+  // ঠিক হিসাব: তুমি 60%, TopUp 20%, Brazil 20%
   const toMe = Math.round(total * 0.60);
-  const toBrazil = total - toReseller - toMe;
+  const toReseller = Math.round(total * 0.20);
+  const toBrazil = total - toMe - toReseller;
+
+  // প্যাকেজ সেম - কোনো চেঞ্জ নাই
+  const brazilPack = pack;
+  const apiPack = pack;
+  // সার্ভার ID - যেকোনো দেশ চলবে, খালি থাকলে ALL, সব যাবে Brazil এ
+  const finalServer = serverId || 'ALL';
 
   const newOrder = {
     id: Math.floor(10000000 + Math.random()*90000000).toString(),
@@ -57,7 +65,9 @@ const handleNewOrder = async () => {
     status: 'Success',
     uid: uid,
     price: total,
-    serverId: serverId,
+    serverId: finalServer,
+    country: finalServer,
+    brazilPack: brazilPack,
   };
 
   setOrders(prev => [newOrder, ...prev]);
@@ -65,13 +75,15 @@ const handleNewOrder = async () => {
   setMyCommission(c => c + toMe);
   setResellerCommission(c => c + toReseller);
   setBrazilSent(c => c + toBrazil);
-  setLastSplit({total, toReseller, toMe, toBrazil, uid, pack, serverId});
+  setLastSplit({total, toReseller, toMe, toBrazil, uid, pack, serverId: finalServer, brazilPack});
 
-  // ব্রাজিল সার্ভারে পাঠানো - এখানে তোমার ব্রাজিল লিংক বসাবা
-  // fetch('https://BRAZIL-SERVER-LINK/api/topup', {method:'POST', body: JSON.stringify({uid, serverId, pack, amount: toBrazil})})
+  // ★★★ ব্রাজিল সার্ভারে পাঠানো - ALL সার্ভার, সব দেশ ★★★
+  // fetch('https://BRAZIL-SERVER-LINK/api/topup', {method:'POST', headers:{'Content-Type':'application/json','x-api-key': apiKey}, body: JSON.stringify({uid: uid, serverId: finalServer, server: 'ALL', region: 'ALL', target: 'BRAZIL', pack: brazilPack, apiPack: apiPack, amount: toBrazil, originalPrice: total})})
 
-  alert(`✅ অর্ডার Success!\nUID: ${uid}\nপ্যাকেজ: ${pack}\nমোট: ৳${total}\nTopUp পেলো: ৳${toReseller} (30%)\nতুমি পেলা: ৳${toMe} (60%) -> 01837450067\nব্রাজিলে গেলো: ৳${toBrazil} (10%)`);
+  alert(`✅ অর্ডার Success!\nসার্ভার: ${finalServer} (ALL) -> Brazil Server এ গেছে\nUID: ${uid}\nপ্যাকেজ: ${pack} (Brazil এও সেম: ${brazilPack})\nমোট: ৳${total}\nতুমি পেলা: ৳${toMe} (60%) -> 01837450067\nTopUp পেলো: ৳${toReseller} (20%)\nব্রাজিলে গেলো: ৳${toBrazil} (20%)`);
   setUid('');
+  setPack('');
+  setPrice('');
 }
 
 if(!checked){
@@ -115,8 +127,8 @@ body{background:#070e1f}
     </div>
 
     <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
-      <div className="card"><div className="k">TOPUP WEBSITE (30%)</div><div className="v" style={{color:'#fbbf24'}}>৳ {resellerCommission}</div></div>
-      <div className="card"><div className="k">BRAZIL SERVER (10%)</div><div className="v" style={{color:'#93c5fd'}}>৳ {brazilSent}</div></div>
+      <div className="card"><div className="k">TOPUP WEBSITE (20%)</div><div className="v" style={{color:'#fbbf24'}}>৳ {resellerCommission}</div></div>
+      <div className="card"><div className="k">BRAZIL SERVER (20%)</div><div className="v" style={{color:'#93c5fd'}}>৳ {brazilSent}</div></div>
     </div>
 
     <div className="card">
@@ -124,7 +136,7 @@ body{background:#070e1f}
         <h3 style={{fontSize:'16px',fontWeight:900}}>🔑 Your API Key</h3>
         <span style={{fontSize:'11px',background:'#1e3a5f',color:'#93c5fd',padding:'4px 10px',borderRadius:'999px',fontWeight:800}}>LIVE</span>
       </div>
-      <p style={{fontSize:'12px',color:'#94a3b8',marginTop:'6px'}}>Use this key to integrate Top-Up API</p>
+      <p style={{fontSize:'12px',color:'#94a3b8',marginTop:'6px'}}>Use this key to integrate Top-Up API - ALL Server - Same Package to Brazil</p>
       <div className="input" style={{color:'#60a5fa',fontFamily:'monospace',wordBreak:'break-all'}}>{apiKey}</div>
       <div style={{display:'flex',gap:'10px',marginTop:'14px'}}>
         <button onClick={copy} className="btn" style={{background:'linear-gradient(90deg,#3b82f6,#6366f1)',color:'white',flex:1}}>Copy Key</button>
@@ -132,27 +144,21 @@ body{background:#070e1f}
       </div>
     </div>
 
-    {/* ★★★ নতুন অর্ডার টেস্ট ★★★ */}
     <div className="card" style={{borderColor:'#3b82f6'}}>
       <h3 style={{fontSize:'16px',fontWeight:900}}>📦 নতুন অর্ডার টেস্ট করো</h3>
-      <p style={{fontSize:'12px',color:'#94a3b8',marginTop:'4px'}}>Top Up ওয়েবসাইট থেকে যেভাবে অর্ডার আসবে</p>
+      <p style={{fontSize:'12px',color:'#94a3b8',marginTop:'4px'}}>Top Up ওয়েবসাইট থেকে যেভাবে অর্ডার আসবে - সব দেশ, ALL সার্ভার, সব Brazil এ যাবে</p>
       <input className="input" value={uid} onChange={e=>setUid(e.target.value)} placeholder="কাস্টমারের UID দাও - যেমন 123456789" />
-      <input className="input" value={serverId} onChange={e=>setServerId(e.target.value)} placeholder="সার্ভার ID - যেমন BD / BR / ALL" />
-      <select value={pack} onChange={e=>setPack(e.target.value)} className="input">
-        <option>100 Diamond</option>
-        <option>310 Diamond</option>
-        <option>520 Diamond</option>
-        <option>1060 Diamond</option>
-        <option>Weekly Membership</option>
-        <option>Monthly Membership</option>
-      </select>
-      <input className="input" type="number" value={price} onChange={e=>setPrice(e.target.value)} placeholder="দাম - যেমন 100" />
+      <input className="input" value={serverId} onChange={e=>setServerId(e.target.value)} placeholder="সার্ভার ID - যেকোনো দেশ লিখো, যেমন BD / IN / ID / US / ALL - খালি রাখলে ALL - সব Brazil এ যাবে" />
+      <input className="input" value={pack} onChange={e=>setPack(e.target.value)} placeholder="প্যাকেজের নাম লিখো - যেকোনো প্যাকেজ চলবে, যেমন 100 Diamond / 9999 Diamond / Custom Pack" />
+      <input className="input" type="number" value={price} onChange={e=>setPrice(e.target.value)} placeholder="দাম লিখো - Top Up ওয়েবসাইটে যে দাম আছে ওইটা" />
       <button onClick={handleNewOrder} className="btn" style={{background:'#dc2626',color:'white',width:'100%',marginTop:'12px'}}>অর্ডার পাঠাও - অটো টাকা ভাগ হবে</button>
       {lastSplit && (
         <div style={{background:'#070d1a',padding:'12px',borderRadius:'12px',marginTop:'12px',fontSize:'12px',lineHeight:'1.8'}}>
           <b>শেষ অর্ডারের ভাগ:</b><br/>
-          মোট: ৳{lastSplit.total} | UID: {lastSplit.uid} | সার্ভার: {lastSplit.serverId}<br/>
-          TopUp (30%): ৳{lastSplit.toReseller} | তুমি (60%): ৳{lastSplit.toMe} | ব্রাজিল (10%): ৳{lastSplit.toBrazil}
+          সার্ভার: {lastSplit.serverId} (ALL) -&gt; Brazil Server<br/>
+          মোট: ৳{lastSplit.total} | UID: {lastSplit.uid}<br/>
+          প্যাকেজ: {lastSplit.pack} | Brazil প্যাকেজ: {lastSplit.brazilPack} (সেম)<br/>
+          তুমি (60%): ৳{lastSplit.toMe} | TopUp (20%): ৳{lastSplit.toReseller} | ব্রাজিল (20%): ৳{lastSplit.toBrazil}
         </div>
       )}
     </div>
@@ -162,7 +168,7 @@ body{background:#070e1f}
       <div style={{marginTop:'8px'}}>
         {orders.map((o,i)=>(
           <div key={i} className="row">
-            <span><b style={{color:'white'}}>{o.id}</b> - {o.pack} - UID:{o.uid}</span>
+            <span><b style={{color:'white'}}>{o.id}</b> - {o.pack} - {o.country} - UID:{o.uid}</span>
             <span className={`badge ${o.status==='Success'?'ok':'pen'}`}>{o.status}</span>
           </div>
         ))}
@@ -170,10 +176,10 @@ body{background:#070e1f}
     </div>
 
     <div style={{textAlign:'center',marginTop:'24px',padding:'20px'}}>
-      <p style={{fontSize:'12px',color:'#475569'}}>ULTRA TOP UP BD API • 30% TopUp | 60% Owner 01837450067 | 10% Brazil • Admin Secured 🔒</p>
+      <p style={{fontSize:'12px',color:'#475569'}}>ULTRA TOP UP BD API • 60% Owner 01837450067 | 20% TopUp | 20% Brazil • ALL Server -&gt; Brazil • Same Package • Unlimited Package • Admin Secured 🔒</p>
     </div>
   </div>
 </div>
 </>
 )
-}
+ }
