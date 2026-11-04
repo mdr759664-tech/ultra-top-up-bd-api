@@ -3,6 +3,7 @@ import { useState } from 'react';
 export default function BuyAPI(){
   const [email,setEmail]=useState('');
   const [trx,setTrx]=useState('');
+  const [password,setPassword]=useState('');
   const [method,setMethod]=useState('bKash');
   const [status,setStatus]=useState('');
   const [loading,setLoading]=useState(false);
@@ -22,15 +23,13 @@ export default function BuyAPI(){
 
   const handleBuy = async () => {
     if(!email || !trx) return alert('ইমেইল + TrxID দাও!');
-    // Admin হলে টাকা ছাড়াই
-    const isAdmin = email === 'admin@gmail.com';
     setLoading(true);
     setStatus('⏳ রোবট চেক করতেছে...');
     try{
       const r = await fetch('/api/buy-api',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({email, trxId: trx, method, isAdmin})
+        body: JSON.stringify({email, trxId: trx, method, password})
       });
       const d = await r.json();
       if(d.success) setStatus(`✅ Success!\n🔑 API Key: ${d.apiKey}\nকপি করে রাখো!\nHeader: x-api-key: ${d.apiKey}`);
@@ -38,6 +37,8 @@ export default function BuyAPI(){
     }catch(e){ setStatus('❌ Error'); }
     setLoading(false);
   };
+
+  const isAdminEmail = email === 'mdr759664@gmail.com';
 
   return(
   <div style={{background:'#fff',minHeight:'100vh',padding:'0'}}>
@@ -49,7 +50,6 @@ export default function BuyAPI(){
       <p style={{color:'#e91e63',fontWeight:'800',fontSize:'18px'}}>নিরাপদ পেমেন্ট</p>
       <div style={{background:'#f1f5f9',padding:'14px',borderRadius:'12px',fontSize:'22px',fontWeight:'800'}}>৳ 500</div>
 
-      {/* পেমেন্ট বাটন */}
       <div style={{display:'flex',gap:'8px',marginTop:'12px'}}>
         {['bKash','Nagad','Rocket','Upay'].map(m=>(
           <button key={m} onClick={()=>setMethod(m)} style={{flex:1,padding:'12px',borderRadius:'10px',border:'none',background:method===m?'#e91e63':'#e2e8f0',color:method===m?'white':'black',fontWeight:'800'}}>{m}</button>
@@ -70,6 +70,10 @@ export default function BuyAPI(){
 
       <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="আপনার ইমেইল দিন" style={{width:'100%',padding:'14px',marginTop:'15px',borderRadius:'10px',border:'1px solid #cbd5e1'}} />
 
+      {isAdminEmail && (
+        <input value={password} onChange={e=>setPassword(e.target.value)} type="password" placeholder="অ্যাডমিন পাসওয়ার্ড দিন" style={{width:'100%',padding:'14px',marginTop:'15px',borderRadius:'10px',border:'1px solid #cbd5e1'}} />
+      )}
+
       <button onClick={handleBuy} disabled={loading} style={{width:'100%',marginTop:'15px',padding:'16px',borderRadius:'12px',background:'#b91c1c',color:'white',fontWeight:'800',border:'none',fontSize:'18px'}}>
         {loading?'চেক হচ্ছে...':'ভেরিফাই'}
       </button>
@@ -77,4 +81,4 @@ export default function BuyAPI(){
       {status && <p style={{marginTop:'15px',background:'#0f172a',color:'white',padding:'12px',borderRadius:'10px',whiteSpace:'pre-wrap'}}>{status}</p>}
     </div>
   </div>);
-}
+                                                            }
